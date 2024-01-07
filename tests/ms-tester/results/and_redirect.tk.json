@@ -1,0 +1,19 @@
+[
+	{
+	  "type": "TK_WORD",
+	  "value": "ls"
+	},
+	{
+	  "type": "TK_AND",
+	  "value": "&&"
+	},
+	{
+	  "type": "TK_REDIRECT_OUT",
+	  "value": ">"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "out"
+	}
+  ]
+  

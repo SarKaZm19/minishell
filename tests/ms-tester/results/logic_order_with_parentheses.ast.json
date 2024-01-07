@@ -1,0 +1,1 @@
+{"type": "logical", "operator": "||", "left": {"type": "command", "argv": ["echo", "1"]}, "right": {"type": "group", "child": {"type": "logical", "operator": "&&", "left": {"type": "command", "argv": ["echo", "2"]}, "right": {"type": "command", "argv": ["echo", "3"]}}}}

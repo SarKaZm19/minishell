@@ -1,0 +1,59 @@
+[
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "echo"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "1"
+	},
+	{
+	  "type": "TK_PIPE",
+	  "value": "|"
+	},
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "echo"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "2"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	},
+	{
+	  "type": "TK_AND",
+	  "value": "&&"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "echo"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "3"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	}
+  ]
+  

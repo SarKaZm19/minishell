@@ -1,0 +1,46 @@
+[
+    {
+        "test_name": "simple_command",
+        "command": "echo hello"
+    },
+    {
+        "test_name": "env_variable_expansion",
+        "command": "echo $HOME"
+    },
+    {
+        "test_name": "simple_pipe",
+        "command": "ls | cat"
+    },
+    {
+        "test_name": "logic_order",
+        "command": "echo 1 || echo 2 && echo 3"
+    },
+    {
+        "test_name": "and_redirect",
+        "command": "ls && > out"
+    },
+    {
+        "test_name": "pipe_redirect",
+        "command": "ls | > out"
+    },
+    {
+        "test_name": "arg_after_redirect",
+        "command": "> out ls | grep l > out 2 | echo hello"
+    },
+    {
+        "test_name": "logic_order_with_parentheses",
+        "command": "echo 1 || (echo 2 && echo 3)"
+    },
+    {
+        "test_name": "nested_parentheses",
+        "command": "( echo 1 | ((echo 2 ) && echo 3 ))"
+    },
+    {
+        "test_name": "complex_no_redirection",
+        "command": "((ls -Rla | wc -c) || (pwd | cat)) && ((cat philosophers/philo/Makefile | wc -l) || (echo -n \"Hello World\"))"
+    },
+    {
+        "test_name": "complex_mixed",
+        "command": "(cat file1.txt | grep 'pattern' > output.txt) && echo \"Search complete\" || (echo \"Error occurred\" > error.log)"
+    }
+]

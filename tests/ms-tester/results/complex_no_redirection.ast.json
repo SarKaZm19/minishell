@@ -1,0 +1,87 @@
+{
+	"type": "logical",
+	"operator": "&&",
+	"left": {
+		"type": "group",
+		"child": {
+			"type": "logical",
+			"operator": "||",
+			"left": {
+				"type": "group",
+				"child": {
+					"type": "pipeline",
+					"left": {
+						"type": "command",
+						"argv": [
+							"ls",
+							"-Rla"
+						]
+					},
+					"right": {
+						"type": "command",
+						"argv": [
+							"wc",
+							"-c"
+						]
+					}
+				}
+			},
+			"right": {
+				"type": "group",
+				"child": {
+					"type": "pipeline",
+					"left": {
+						"type": "command",
+						"argv": [
+							"pwd"
+						]
+					},
+					"right": {
+						"type": "command",
+						"argv": [
+							"cat"
+						]
+					}
+				}
+			}
+		}
+	},
+	"right": {
+		"type": "group",
+		"child": {
+			"type": "logical",
+			"operator": "||",
+			"left": {
+				"type": "group",
+				"child": {
+					"type": "pipeline",
+					"left": {
+						"type": "command",
+						"argv": [
+							"cat",
+							"philosophers/philo/Makefile"
+						]
+					},
+					"right": {
+						"type": "command",
+						"argv": [
+							"wc",
+							"-l"
+						]
+					}
+				}
+			},
+			"right": {
+				"type": "group",
+				"child": {
+					"type": "command",
+					"argv": [
+						"echo",
+						"-n",
+						"\"Hello World\""
+					]
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,127 @@
+[
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "ls"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "-Rla"
+	},
+	{
+	  "type": "TK_PIPE",
+	  "value": "|"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "wc"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "-c"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	},
+	{
+	  "type": "TK_OR",
+	  "value": "||"
+	},
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "pwd"
+	},
+	{
+	  "type": "TK_PIPE",
+	  "value": "|"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "cat"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	},
+	{
+	  "type": "TK_AND",
+	  "value": "&&"
+	},
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "cat"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "philosophers/philo/Makefile"
+	},
+	{
+	  "type": "TK_PIPE",
+	  "value": "|"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "wc"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "-l"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	},
+	{
+	  "type": "TK_OR",
+	  "value": "||"
+	},
+	{
+	  "type": "TK_GROUP_OPEN",
+	  "value": "("
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "echo"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "-n"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "\"Hello World\""
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	},
+	{
+	  "type": "TK_GROUP_CLOSE",
+	  "value": ")"
+	}
+  ]
+  

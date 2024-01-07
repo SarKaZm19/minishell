@@ -1,0 +1,51 @@
+[
+	{
+	  "type": "TK_REDIRECT_OUT",
+	  "value": ">"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "out"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "ls"
+	},
+	{
+	  "type": "TK_PIPE",
+	  "value": "|"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "grep"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "l"
+	},
+	{
+	  "type": "TK_REDIRECT_OUT",
+	  "value": ">"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "out"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "2"
+	},
+	{
+	  "type": "TK_PIPE",
+	  "value": "|"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "echo"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "hello"
+	}
+  ]
+  

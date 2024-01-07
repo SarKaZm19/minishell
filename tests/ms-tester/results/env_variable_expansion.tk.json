@@ -1,0 +1,11 @@
+[
+	{
+	  "type": "TK_WORD",
+	  "value": "echo"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "$HOME"
+	}
+  ]
+  

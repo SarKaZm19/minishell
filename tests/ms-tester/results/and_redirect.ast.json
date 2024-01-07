@@ -1,0 +1,16 @@
+{
+	"type": "logical",
+	"operator": "&&",
+	"left": {
+		"type": "command",
+		"argv": [
+			"ls"
+		]
+	},
+	"right": {
+		"type": "redirection",
+		"direction": ">",
+		"file": "out",
+		"child": "NULL"
+	}
+}

@@ -1,0 +1,1 @@
+{"type": "pipeline", "left": {"type": "command", "argv": ["ls"]}, "right": {"type": "command", "argv": ["cat"]}}

@@ -1,0 +1,28 @@
+{
+    "type": "pipeline",
+    "left":  {
+            "type": "pipeline",
+            "left": {
+				"type": "redirection",
+				"direction": ">",
+				"file": "out",
+				"child":{
+                	"type": "command",
+                	"argv": ["ls"]
+				}
+            },
+            "right": {
+                "type": "redirection",
+                "direction": ">",
+                "file": "out",
+                "child": {
+                    "type": "command",
+                    "argv": ["grep", "l"]
+                }
+            }
+    },
+    "right": {
+        "type": "command",
+        "argv": ["echo", "hello"]
+    }
+}

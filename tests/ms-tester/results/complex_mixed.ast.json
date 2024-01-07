@@ -1,0 +1,55 @@
+{
+	"type": "logical",
+	"operator": "||",
+	"left": {
+		"type": "logical",
+		"operator": "&&",
+		"left": {
+			"type": "group",
+			"child": {
+				"type": "pipeline",
+				"left": {
+					"type": "command",
+					"argv": [
+						"cat",
+						"file1.txt"
+					]
+				},
+				"right": {
+					"type": "redirection",
+					"direction": ">",
+					"file": "output.txt",
+					"child": {
+						"type": "command",
+						"argv": [
+							"grep",
+							"'pattern'"
+						]
+					}
+				}
+			}
+		},
+		"right": {
+			"type": "command",
+			"argv": [
+				"echo",
+				"\"Search complete\""
+			]
+		}
+	},
+	"right": {
+		"type": "group",
+		"child": {
+			"type": "redirection",
+			"direction": ">",
+			"file": "error.log",
+			"child": {
+				"type": "command",
+				"argv": [
+					"echo",
+					"\"Error occurred\""
+				]
+			}
+		}
+	}
+}

@@ -1,0 +1,1 @@
+- read [Difference between shell and environment variables](https://stackoverflow.com/questions/3341372/difference-between-shell-and-environment-variables#3341401) from [Slack: $ character](https://42born2code.slack.com/archives/CN9RHKQHW/p1697472792145089)

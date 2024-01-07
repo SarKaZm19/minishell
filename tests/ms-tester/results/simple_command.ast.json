@@ -1,0 +1,7 @@
+{
+	"type": "command",
+	"argv": [
+		"echo",
+		"hello"
+	]
+}

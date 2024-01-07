@@ -1,0 +1,15 @@
+[
+	{
+	  "type": "TK_WORD",
+	  "value": "ls"
+	},
+	{
+	  "type": "TK_PIPE",
+	  "value": "|"
+	},
+	{
+	  "type": "TK_WORD",
+	  "value": "cat"
+	}
+  ]
+  
