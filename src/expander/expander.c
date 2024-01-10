@@ -6,30 +6,61 @@
 /*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 23:58:31 by fvastena          #+#    #+#             */
-/*   Updated: 2024/01/09 19:53:12 by fvastena         ###   ########.fr       */
+/*   Updated: 2024/01/10 19:04:15 by fvastena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*get_var(char *tmp, int i, int *save_i)
+char	*get_var(char *tmp, int *tmp_i)
 {
 	char	*var;
 	int		j;
 
-	j = i;
-	while (tmp[i + j] && tmp[i + j] != '\"' && tmp[i + j] != '\'' && tmp[i + j] != '$' && tmp[i + j] != '*')
-		j++;
-	*save_i += j + 1;
-	var = ft_substr(tmp, i, j);
+	j = 0;
+	if (tmp[*tmp_i + j] == '$' || tmp[*tmp_i + j] == '*')
+	{
+		j += 1;
+		while (tmp[*tmp_i + j] && !is_space(tmp[*tmp_i + j]) && tmp[*tmp_i + j] != '\"' && tmp[*tmp_i + j] != '\'' && tmp[*tmp_i + j] != '$' && tmp[*tmp_i + j] != '*')
+			j++;
+	}
+	else
+	{
+		while (tmp[*tmp_i + j] && tmp[*tmp_i + j] != '\"' && tmp[*tmp_i + j] != '\'' && tmp[*tmp_i + j] != '$' && tmp[*tmp_i + j] != '*')
+			j++;
+	}
+	printf("get_var j = %d, tmp_i = %d\n", j, *tmp_i);
+	var = ft_substr(tmp, *tmp_i, j);
 	return (var);
 }
 
-char	*get_var_sub(char *var)
+char	*get_var_sub(char *var, int *tmp_i)
 {
 	char	*var_sub;
+	char	*tmp;
+	char	*var_env;
+	int		i;
 
-	var_sub = ft_strdup(getenv(var));
+	i = 0;
+	while (var[i])
+	{
+		if (is_space(var[i]))
+			break ;
+		i++;
+	}
+	tmp = ft_substr(var, 0, i);
+	printf("var_sub tmp = %s\n", tmp);
+	var_env = getenv(tmp);
+	printf("vr_env = %s\n", var_env);
+	if (var_env)
+		var_sub = ft_strdup(var_env);
+	else
+		var_sub = ft_strdup("");
+	printf("var_sub = %s\n", var_sub);
+	printf("size_var_sub_tmp = %zu\n", ft_strlen(tmp));
+	*tmp_i += ft_strlen(var) + 1;
+	printf("3new_tmp_i = %d\n", *tmp_i);
+
 	return (var_sub);
 }
 
@@ -41,8 +72,9 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 	int		save_i;
 
 	printf("expand_var tmp = %s && tmp_i = %d\n", tmp, *tmp_i);
-	save_i = 0;
-	var = get_var(tmp, *tmp_i, &save_i);
+	save_i = *tmp_i;
+	var = get_var(tmp, tmp_i);
+	printf("var = %s\n", var);
 	d_quote_expand = NULL;
 	if (!var)
 	{
@@ -51,11 +83,9 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 		else
 			return (NULL);
 	}
-	printf("expand_var var = .%s.\n", var);
 	if (tmp[save_i] == '$')
 	{
-		printf("$\n");
-		tmp_expand = get_var_sub(var);
+		tmp_expand = get_var_sub(var + 1, tmp_i);
 		printf("var = %s, getenv(var) = %s\n", var, tmp_expand);
 		if (tmp_expand)
 		{
@@ -65,7 +95,6 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 				d_quote_expand = ft_strdup(tmp_expand);
 			free(tmp_expand);
 		}
-		free(new_cmd);
 		printf("tmp_expand var = %s\n", tmp_expand);
 	}
 	else if (tmp[*tmp_i] == '*')
@@ -78,9 +107,13 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 				d_quote_expand = ft_strdup(var);
 			printf("1d_quote_expand = %s\n", d_quote_expand);
 		}
+		*tmp_i += save_i;
+		printf("1new_tmp_i = %d\n", *tmp_i);
+
 	}
 	else
 	{
+		printf("|||||||||||||||\n");
 		if (var)
 		{
 			if (new_cmd)
@@ -89,9 +122,11 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 				d_quote_expand = ft_strdup(var);
 			printf("2d_quote_expand = %s\n", d_quote_expand);
 		}
+		*tmp_i += ft_strlen(var);
+		printf("2new_tmp_i = %d\n", *tmp_i);
+
 	}
-	*tmp_i += save_i;
-	printf("new_tmp_i = %d\n", *tmp_i);
+	
 	printf("expand_var = %s\n", d_quote_expand);
 	return (d_quote_expand);
 }
@@ -161,16 +196,7 @@ char	*expand_no_quotes(char *cmd, char *new_cmd, int *start_i, int *parts)
 	sub = expand_var(new_cmd, cmd, start_i);
 	if (sub)
 	{
-		if (cmd[*start_i + j] == '$')
-		{
-			if (sub[k] && !is_space(sub[k]))
-				*parts += 1;
-			while (sub[k] && !is_space(sub[k]))
-				k++;
-			while (sub[k] && is_space(sub[k]))
-				k++;
-		}
-		else if (cmd[*start_i + j] == '*')
+		if (cmd[*start_i + j] == '$' || cmd[*start_i + j] == '*')
 		{
 			if (sub[k] && !is_space(sub[k]))
 				*parts += 1;
@@ -182,7 +208,6 @@ char	*expand_no_quotes(char *cmd, char *new_cmd, int *start_i, int *parts)
 		else
 			*parts += 1;
 	}
-
 	*start_i += j;
 	printf("start_i no quotes incr =  %d\n", *start_i);
 	return (sub);
@@ -195,37 +220,51 @@ char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i)
 	int		j;
 	int		i;
 	char	*tmp;
+	char	*tmp2;
 	char	*d_quote_expand;
-	
+	int		test = 0;
+
 	*start_i += 1;
 	j = 0;
 	while (cmd[*start_i + j] && cmd[*start_i + j] != '\"')
 		j++;
 	tmp = ft_substr(cmd, *start_i, j);
+	d_quote_expand = NULL;
 	// prot tmp + free
 	printf("d_quote_substr = .%s., start_i = %d, j = %d\n", tmp, *start_i, j);
 	i = 0;
 	while (tmp[i])
 	{
+		test++;
+		if (test == 10)
+		{
+			printf("limit reached\n");
+			return (NULL);
+		}
+		printf("tmp[%d] = %c\n", i, tmp[i]);
 		if (tmp[i] == '$')
-			d_quote_expand = expand_var(new_cmd, tmp, &i);
+			tmp2 = expand_var(new_cmd, tmp + i, &i);
 		else
-			d_quote_expand = expand_var(new_cmd, tmp, &i);
+			tmp2 = expand_var(new_cmd, tmp + i, &i);
+		printf("d_quote_expand_var = %s\n", d_quote_expand);
+		if (new_cmd)
+		{
+			printf("new_cmd exists --> join\n");
+			free(new_cmd);
+			new_cmd = ft_strjoin(new_cmd, tmp2);
+		}
+		else
+		{
+			printf("new_cmd doesnt exists --> dup\n");
+			new_cmd = ft_strdup(tmp2);
+		}
+		if (tmp2)
+			free(tmp2);
+		printf("tmp_i before loop = %d\n", i);
 	}
-/* 	if (new_cmd)
-	{
-		printf("new_cmd exists --> join\n");
-		free(new_cmd);
-		new_cmd = ft_strjoin(new_cmd, tmp2);
-	}
-	else
-	{
-		printf("new_cmd doesnt exists --> dup\n");
-		new_cmd = ft_strdup(tmp2);
-	} */
 	printf("new_cmd quote_expand = .%s.\n", new_cmd);
 	*start_i += j + 1;
-	return (d_quote_expand);
+	return (new_cmd);
 }
 
 char	*expand_s_quote(char *cmd, char *new_cmd, int *start_i)
@@ -381,9 +420,65 @@ char	**expand(char *cmd, t_shell *sh, int *cmds_size)
 			// nouveau tableau + ajout new_cmd dans tab
 		}
 		cmd_tab = cmd_to_tab(cmd_tab, new_cmd, parts);
-		printf("cmd after an expansion = %s\n", new_cmd);
+		*cmds_size = parts;
+		printf("cmd after an expansion = .%s.\n", new_cmd);
 	}
 	return (NULL);
+}
+
+char	**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size)
+{
+	char	**new_cmds;
+	int		i;
+	int		j;
+
+	printf("tab_i = %d, new_tab_size = %d\n", tab_i, new_tab_size);
+	new_cmds = malloc(sizeof(char *) * (tab_i + new_tab_size + 1));
+	if (!new_cmds)
+		return (NULL);
+	i = 0;
+	while (i < tab_i - 1)
+	{
+		new_cmds[i] = ft_strdup(cmd_tab[i]);
+		printf("print existing tab index\n");
+		i++;
+	}
+	j = 0;
+	new_cmds[i] = ft_strjoin(cmd_tab[i], cmd_to_add[j]);
+	j++;
+	i++;
+	printf("join last cmd_tab with cmd_to_add[0]\n");
+	while (j < new_tab_size)
+	{
+		new_cmds[i] = ft_strdup(cmd_to_add[j]);
+		printf("add cmds to cmd_tab\n");
+		i++;
+		j++;
+	}
+	new_cmds[i] = NULL;
+	i = 0;
+	if (cmd_tab[i])
+	{
+		while (cmd_tab[i])
+		{
+			free(cmd_tab[i]);
+			cmd_tab[i] = NULL;
+		}
+		free(cmd_tab);
+		cmd_tab = NULL;
+	}
+	i = 0;
+	if (cmd_to_add[i])
+	{
+		while (cmd_to_add[i])
+		{
+			free(cmd_to_add[i]);
+			cmd_to_add[i] = NULL;
+		}
+		free(cmd_to_add);
+		cmd_tab = NULL;
+	}
+	return (cmd_tab);
 }
 // Expander loop through the cmds table and try expand with expand() function
 // expand() returns a tab of cmd that have to be added to the main cmd_tab
@@ -406,13 +501,14 @@ char	**expand(char *cmd, t_shell *sh, int *cmds_size)
 		i = 0;
 		while (node->data.command.cmd_exe[i])
 			i++;
-		cmds_size = i;
 		i = 0;
 		while (node->data.command.cmd_exe[i])
 		{
-			j = cmds_size;
+			j = 0;
 			exp_word_split = expand(node->data.command.cmd_exe[i], sh, &cmds_size);
 			printf("------end exp------\n");
+			printf("cmds size = %d\n", cmds_size);
+			cmd_tab = add_cmds(cmd_tab, i, exp_word_split, cmds_size);
 			//cmd_tab = add_cmds(cmd_tab, i, exp_word_split, cmds_size);
 			// ajout tableau recu dans expand dans le nouveau tab general.
 			// --> Expand renverra le tableau pour la cmd en cours --> $var$var
