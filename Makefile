@@ -4,7 +4,7 @@
 # Compiler and flags
 
 CC				=	gcc
-CFLAGS			=	-Wall -Wextra -Werror
+CFLAGS			=	-Wall -Wextra -Werror -fsanitize=address
 CFLAGS			+=	-g -Iinclude -Isrc -Ofast
 RM				=	rm -rf
 MSHELL			=	$(NAME)
