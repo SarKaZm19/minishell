@@ -1,1 +1,1 @@
-{"type": "command", "cmd_exe": ["ls", "\"la lr $test lv lt\""]}
+{"type": "command", "cmd_exe": ["ls", "\"la ls la\""]}

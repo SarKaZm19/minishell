@@ -65,8 +65,22 @@ char				*tk_type_to_string(t_token_type type);
 
 
 // ----- EXPANSION ----- //
+// ----- Expander.c ---- //
 t_AST				*expander(t_AST *node, t_shell *sh);
 char				**expand(char *str, t_shell *sh, int *current_size);
+char	*expand_var(char *new_cmd, char *tmp, int *tmp_i);
+// ----- var_substitution.c ---- //
+char	*get_var(char *tmp, int *tmp_i);
+char	*get_var_sub(char *var, int *tmp_i);
+// ----- expander_case.c ----- //
+char	*expand_no_quotes(char *cmd, char *new_cmd, int *start_i, int *parts);
+char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i);
+char	*expand_s_quote(char *cmd, char *new_cmd, int *start_i);
+// ----- cmd_tab_expansion.c ----- //
+char	**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size);
+char	**split_cmds(char *new_cmd, int parts);
+char	**cmd_to_tab(char **cmd_tab, char *new_cmd, int parts);
+
 
 // ----- EXECUTION ----- //
 int					execute(t_AST *node, t_shell *sh);

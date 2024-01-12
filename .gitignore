@@ -1,0 +1,16 @@
+.DS_Store
+**/.DS_Store
+build/
+.vscode/
+lib/libft/obj/
+*.a
+lib/get_next_line/obj/
+include/lib/libft/libft.a
+include/lib/get_next_line/get_next_line.a
+# Test files
+in
+infile
+out
+outfile
+tokens.json
+ast.json
