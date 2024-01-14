@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 {"type": "command", "cmd_exe": ["ls", "la", "$test", "lv", "lt"]}
+=======
+{"type": "command", "cmd_exe": ["ls", "as$test\"la\""]}
+>>>>>>> Stashed changes

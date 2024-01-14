@@ -6,7 +6,11 @@
 /*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/12 02:46:13 by fvastena          #+#    #+#             */
+<<<<<<< Updated upstream
 /*   Updated: 2024/01/12 13:58:37 by fvastena         ###   ########.fr       */
+=======
+/*   Updated: 2024/01/14 21:33:08 by fvastena         ###   ########.fr       */
+>>>>>>> Stashed changes
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,16 +144,27 @@ char	**cmd_to_tab(char **cmd_tab, char *new_cmd, int parts)
 			new_tab[i] = ft_strdup(cmd_tab[i]);
 			i++;
 		}
+		printf("copied existing\n");
 		if (i != 0)
 			i--;
+		printf("i = %d\n", i);
 		free(new_tab[i]);
-		new_tab[i] = ft_strjoin(cmd_tab[i], tmp[j]);
+		if (tmp)
+			new_tab[i] = ft_strjoin(cmd_tab[i], tmp[j]);
+		else
+			new_tab[i] = ft_strjoin(cmd_tab[i], new_cmd);
+		printf("(after join new_tab[%d] = %s\n", i, new_tab[i]);
 		while (++i < parts)
 		{
 			new_tab[i] = ft_strdup(tmp[++j]);
 		}
+<<<<<<< Updated upstream
 		new_tab[i] = NULL;
+=======
+		printf("copied new\n");
+>>>>>>> Stashed changes
 	}
+	new_tab[i] = NULL;
 	if (new_cmd)
 		free(new_cmd);
 	return (new_tab);

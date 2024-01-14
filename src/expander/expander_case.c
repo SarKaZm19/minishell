@@ -6,7 +6,11 @@
 /*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/12 02:39:34 by fvastena          #+#    #+#             */
+<<<<<<< Updated upstream
 /*   Updated: 2024/01/12 13:58:08 by fvastena         ###   ########.fr       */
+=======
+/*   Updated: 2024/01/14 21:42:47 by fvastena         ###   ########.fr       */
+>>>>>>> Stashed changes
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,15 +63,30 @@ char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i)
 	i = 0;
 	while (tmp[i])
 	{
+<<<<<<< Updated upstream
 		if (tmp[i] == '$')
 			tmp2 = expand_var(new_cmd, tmp, &i);
 		else
 			tmp2 = expand_var(new_cmd, tmp, &i);
 		if (new_cmd)
 		{
+=======
+		test++;
+		if (test == 10)
+		{
+			printf("limit reached\n");
+			return (NULL);
+		}
+		printf("tmp[%d] = %c\n", i, tmp[i]);
+		tmp2 = expand_var(new_cmd, tmp, &i);
+		printf("d_quote_expand_var = %s\n", tmp2);
+		if (new_cmd)
+		{
+			printf("new_cmd exists --> join\n");
+			printf("new_cmd = %s\n", new_cmd);
+			printf("tmp2 = %s\n", tmp2);
+>>>>>>> Stashed changes
 			tmp3 = ft_strdup(new_cmd);
-			free(new_cmd);
-			new_cmd = NULL;
 			new_cmd = ft_strjoin(tmp3, tmp2);
 			free(tmp3);
 			tmp3 = NULL;
@@ -98,8 +117,6 @@ char	*expand_s_quote(char *cmd, char *new_cmd, int *start_i)
 	else
 	{
 		s_quote_expand = ft_strjoin(new_cmd, tmp);
-		free(new_cmd);
-		new_cmd = NULL;
 	}
 	if (tmp)
 	{
