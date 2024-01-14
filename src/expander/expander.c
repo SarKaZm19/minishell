@@ -5,12 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/05 23:58:31 by fvastena          #+#    #+#             */
-<<<<<<< Updated upstream
-/*   Updated: 2024/01/12 13:57:21 by fvastena         ###   ########.fr       */
-=======
-/*   Updated: 2024/01/14 23:17:43 by fvastena         ###   ########.fr       */
->>>>>>> Stashed changes
+/*   Created: 2024/01/12 02:39:07 by fvastena          #+#    #+#             */
+/*   Updated: 2024/01/15 00:10:19 by fvastena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +22,7 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 	save_i = *tmp_i;
 	d_quote_expand = NULL;
 	var = get_var(tmp, tmp_i);
-<<<<<<< Updated upstream
-	d_quote_expand = NULL;
-=======
 	printf("var = %s\n", var);
->>>>>>> Stashed changes
 	if (!var)
 	{
 		if (new_cmd)
@@ -41,6 +33,7 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 	if (tmp[save_i] == '$')
 	{
 		tmp_expand = get_var_sub(var + 1, tmp_i);
+		printf("new_cmd in $ = %s\n", new_cmd);
 		if (tmp_expand)
 		{
 			if (new_cmd)
@@ -48,10 +41,14 @@ char	*expand_var(char *new_cmd, char *tmp, int *tmp_i)
 			else
 				d_quote_expand = ft_strdup(tmp_expand);
 			free(tmp_expand);
-			*tmp_i += ft_strlen(var);
+			printf("d_quote_expand = %s\n", d_quote_expand);
 		}
 		else
-			return (NULL);
+		{
+			if (new_cmd)
+				d_quote_expand = ft_strdup(new_cmd);
+		}
+		*tmp_i += ft_strlen(var) + 1;
 	}
 	else if (tmp[*tmp_i] == '*')
 	{
@@ -108,6 +105,7 @@ char	**expand(char *cmd, t_shell *sh, int *cmds_size)
 		{
 			new_cmd = expand_no_quotes(cmd, new_cmd, &i, &parts);
 		}
+		printf("new_cmd expand() = %s\n", new_cmd);
 		cmd_tab = cmd_to_tab(cmd_tab, new_cmd, parts);
 		if (!cmd_tab)
 			return (NULL);
@@ -123,17 +121,10 @@ char	**expand(char *cmd, t_shell *sh, int *cmds_size)
 
  t_AST	*expander(t_AST *node, t_shell *sh)
 {
-<<<<<<< Updated upstream
-	// (void)sh;
-	// (void)node;
-	int		i;
-	int		j;
-=======
 	(void)sh;
 	int		i;
 	int		j;
 	//int		mem_size;
->>>>>>> Stashed changes
 	int		cmds_size;
 	char	**exp_word_split;
 	char	**cmd_tab;
@@ -150,15 +141,11 @@ char	**expand(char *cmd, t_shell *sh, int *cmds_size)
 		while (node->data.command.cmd_exe[i])
 		{
 			exp_word_split = expand(node->data.command.cmd_exe[i], sh, &cmds_size);
-<<<<<<< Updated upstream
-			cmd_tab = add_cmds(cmd_tab, i, exp_word_split, cmds_size);
-		}
-		node->data.command.cmd_exe = cmd_tab;
-	}
-=======
 			printf("------end exp------\n");
 			printf("cmds size = %d\n", cmds_size);
 			cmd_tab = add_cmds(cmd_tab, i, exp_word_split, cmds_size);
+			printf("cmd_tab[0] = %s\n", cmd_tab[0]);
+			printf("??\n");
 			//cmd_tab = add_cmds(cmd_tab, i, exp_word_split, cmds_size);
 			// ajout tableau recu dans expand dans le nouveau tab general.
 			// --> Expand renverra le tableau pour la cmd en cours --> $var$var
@@ -176,8 +163,6 @@ char	**expand(char *cmd, t_shell *sh, int *cmds_size)
 			i++;
 		}
 		node->data.command.cmd_exe = cmd_tab;
-		printf("cmd_exe[0] = .%s. cmd_exe[1] = .%s.\n", node->data.command.cmd_exe[0], node->data.command.cmd_exe[1]);
 	} 
->>>>>>> Stashed changes
 	return (node);
 }

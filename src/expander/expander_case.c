@@ -6,11 +6,7 @@
 /*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/12 02:39:34 by fvastena          #+#    #+#             */
-<<<<<<< Updated upstream
-/*   Updated: 2024/01/12 13:58:08 by fvastena         ###   ########.fr       */
-=======
-/*   Updated: 2024/01/14 21:42:47 by fvastena         ###   ########.fr       */
->>>>>>> Stashed changes
+/*   Updated: 2024/01/14 23:49:52 by fvastena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +50,7 @@ char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i)
 	char	*tmp;
 	char	*tmp2;
 	char	*tmp3;
+	int		test;
 
 	*start_i += 1;
 	j = 0;
@@ -61,16 +58,9 @@ char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i)
 		j++;
 	tmp = ft_substr(cmd, *start_i, j);
 	i = 0;
+	test = 0;
 	while (tmp[i])
 	{
-<<<<<<< Updated upstream
-		if (tmp[i] == '$')
-			tmp2 = expand_var(new_cmd, tmp, &i);
-		else
-			tmp2 = expand_var(new_cmd, tmp, &i);
-		if (new_cmd)
-		{
-=======
 		test++;
 		if (test == 10)
 		{
@@ -85,14 +75,21 @@ char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i)
 			printf("new_cmd exists --> join\n");
 			printf("new_cmd = %s\n", new_cmd);
 			printf("tmp2 = %s\n", tmp2);
->>>>>>> Stashed changes
-			tmp3 = ft_strdup(new_cmd);
-			new_cmd = ft_strjoin(tmp3, tmp2);
+			if (tmp2)
+			{
+				tmp3 = ft_strdup(new_cmd);
+				new_cmd = ft_strjoin(tmp3, tmp2);
+			}
 			free(tmp3);
 			tmp3 = NULL;
 		}
 		else
-			new_cmd = ft_strdup(tmp2);
+		{
+			if (tmp2)
+				new_cmd = ft_strdup(tmp2);
+			else
+				new_cmd = NULL;
+		}
 		if (tmp2)
 			free(tmp2);
 	}

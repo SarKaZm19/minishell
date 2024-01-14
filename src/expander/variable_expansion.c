@@ -6,7 +6,7 @@
 /*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/12 02:37:41 by fvastena          #+#    #+#             */
-/*   Updated: 2024/01/12 13:57:37 by fvastena         ###   ########.fr       */
+/*   Updated: 2024/01/14 23:40:07 by fvastena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ char	*get_var_sub(char *var, int *tmp_i)
 	int		i;
 
 	i = 0;
+	(void)tmp_i;
 	while (var[i])
 	{
 		if (is_space(var[i]))

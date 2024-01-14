@@ -6,11 +6,7 @@
 /*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/12 02:46:13 by fvastena          #+#    #+#             */
-<<<<<<< Updated upstream
-/*   Updated: 2024/01/12 13:58:37 by fvastena         ###   ########.fr       */
-=======
-/*   Updated: 2024/01/14 21:33:08 by fvastena         ###   ########.fr       */
->>>>>>> Stashed changes
+/*   Updated: 2024/01/14 23:55:01 by fvastena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,27 +49,6 @@ char	**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size)
 	}
 	new_cmds[i] = NULL;
 	i = 0;
-	if (cmd_tab)
-	{
-		while (cmd_tab[i])
-		{
-			free(cmd_tab[i]);
-			cmd_tab[i] = NULL;
-		}
-		free(cmd_tab);
-		cmd_tab = NULL;
-	}
-	i = 0;
-	if (cmd_to_add)
-	{
-		while (cmd_to_add[i])
-		{
-			free(cmd_to_add[i]);
-			cmd_to_add[i] = NULL;
-		}
-		free(cmd_to_add);
-		cmd_to_add = NULL;
-	};
 	return (new_cmds);
 }
 
@@ -131,7 +106,6 @@ char	**cmd_to_tab(char **cmd_tab, char *new_cmd, int parts)
 			new_tab[i] = ft_strdup(new_cmd);
 			i++;
 		}
-		new_tab[i] = NULL;
 	}
 	else
 	{
@@ -158,11 +132,7 @@ char	**cmd_to_tab(char **cmd_tab, char *new_cmd, int parts)
 		{
 			new_tab[i] = ft_strdup(tmp[++j]);
 		}
-<<<<<<< Updated upstream
-		new_tab[i] = NULL;
-=======
 		printf("copied new\n");
->>>>>>> Stashed changes
 	}
 	new_tab[i] = NULL;
 	if (new_cmd)
