@@ -44,15 +44,16 @@ typedef struct s_pipe
 typedef struct s_expander
 {
 	char	*cmd;
-	char	*var_in_cmd;
-	char	*var_sub;
+	char	*cmd_part;
+	char	*var_to_sub;
+	char	*subbed_var;
+	char	*new_cmd;
+	int		op_index;
 	int		cmd_len;
-	int		var_len;
-	int		var_sub_len;
-	int		nb_var_words;
-
-	char	quote;
-	int		start_sub_i;
+	int		cmd_part_len;
+	int		var_to_sub_len;
+	int		subbed_var_len;
+	int		split_parts;
 }				t_expander;
 
 # define READ_END 0

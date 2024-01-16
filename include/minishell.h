@@ -68,18 +68,23 @@ char				*tk_type_to_string(t_token_type type);
 // ----- Expander.c ---- //
 t_AST				*expander(t_AST *node, t_shell *sh);
 char				**expand(char *str, t_shell *sh, int *current_size);
-char	*expand_var(char *new_cmd, char *tmp, int *tmp_i);
+char				*expand_var(t_expander *exp, int *tmp_i);
+// ----- exp_struct.c ----- //
+void				init_expander(t_expander *exp, char *cmd);
+void				reset_exp(t_expander *exp);
 // ----- var_substitution.c ---- //
-char	*get_var(char *tmp, int *tmp_i);
-char	*get_var_sub(char *var, int *tmp_i);
+char				*get_var(char *tmp, int *tmp_i);
+char				*get_var_sub(char *var, int *tmp_i);
 // ----- expander_case.c ----- //
-char	*expand_no_quotes(char *cmd, char *new_cmd, int *start_i, int *parts);
-char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i);
-char	*expand_s_quote(char *cmd, char *new_cmd, int *start_i);
+char				*expand_no_quotes(t_expander *exp, int *start_i);
+char				*expand_d_quote(t_expander *exp, int *start_i);
+char				*expand_var_in_d_quotes(t_expander *exp, int *start_i);
+char				*expand_s_quote(t_expander *exp, int *start_i);
 // ----- cmd_tab_expansion.c ----- //
-char	**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size);
-char	**split_cmds(char *new_cmd, int parts);
-char	**cmd_to_tab(char **cmd_tab, char *new_cmd, int parts);
+char				**word_split_expander(t_expander *exp, char **cmd_tab);
+char				**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size);
+char				**split_cmds(t_expander *exp);
+char				**cmd_to_tab(t_expander *exp, char **cmd_tab);
 
 
 // ----- EXECUTION ----- //

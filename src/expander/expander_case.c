@@ -1,124 +1,118 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander_case.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: fvastena <fvastena@student.s19.be>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/12 02:39:34 by fvastena          #+#    #+#             */
-/*   Updated: 2024/01/14 23:49:52 by fvastena         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
-char	*expand_no_quotes(char *cmd, char *new_cmd, int *start_i, int *parts)
+char	*expand_no_quotes(t_expander *exp, int *start_i)
 {
-	char	*sub;
+	int		i;
 	int		j;
-	int		k;
-	int		mem_start;
+	char	*expand;
 
 	j = 0;
-	k = 0;
-	mem_start = *start_i;
-	sub = expand_var(new_cmd, cmd, start_i);
-	if (sub)
+	while (exp->cmd[*start_i + j] && exp->cmd[*start_i + j] != '\"')
+		j++;
+	exp->cmd_part = ft_substr(exp->cmd, *start_i, j);
+	exp->cmd_part_len = j;
+	i = 0;
+	while (exp->cmd_part[i])
 	{
-		if (cmd[mem_start] == '$' || cmd[mem_start] == '*')
-		{
-			if (sub[k] && !is_space(sub[k]))
-				*parts += 1;
-			while (sub[k] && !is_space(sub[k]))
-				k++;
-			while (sub[k] && is_space(sub[k]))
-				k++;
-		}
+		j = i;
+		while (exp->cmd_part[i] && exp->cmd_part[i] != '$')
+			i++;
+		exp->op_index = i;
+		if (exp->cmd_part[i + j] == '$')
+			expand = expand_var(exp, &i);
 		else
-			*parts += 1;
+			expand = ft_substr(exp->cmd_part, i, j);
+		if (expand)
+		{
+			if (exp->new_cmd)
+				exp->new_cmd = ft_strjoin(exp->new_cmd, expand);
+			else
+				exp->new_cmd = ft_strdup(expand);
+		}
+		if (expand)
+		{
+			free(expand);
+			expand = NULL;
+		}
 	}
-	*start_i += j;
-	return (sub);
-	// si * dans une var, pas de substitution du *, interprete litteralement
-	// voir si on peut pas lire tout d un coup et tout mettre dans un tableau apres dans expand
+	*start_i += j + 1;
+	return (exp->new_cmd);
+	//si * dans une var, pas de substitution du *, interprete litteralement
+	//voir si on peut pas lire tout d un coup et tout mettre dans un tableau apres dans expand
 }
 
-char	*expand_d_quote(char *cmd, char *new_cmd, int *start_i)
+char	*expand_var_in_d_quotes(t_expander *exp, int *tmp_i)
 {
 	int		j;
+
+	*tmp_i += 1;
+	j = 0;
+	while (exp->cmd_part[*tmp_i + j] && !is_space(exp->cmd_part[*tmp_i + j]) && ft_isalnum(exp->cmd_part[*tmp_i + j]))
+		j++;
+	exp->var_to_sub = ft_substr(exp->cmd_part, *tmp_i, j);
+	exp->var_to_sub_len = j;
+	*tmp_i += exp->var_to_sub_len;
+	printf("exp->var_to_sub d_quotes = .%s., len = %d\n", exp->var_to_sub, exp->var_to_sub_len);
+	printf("new_tmp_i = %d\n", *tmp_i);
+	exp->subbed_var = getenv(exp->var_to_sub);
+	exp->subbed_var_len = ft_strlen(exp->subbed_var);
+	printf("exp->subbed_var d_quotes = .%s., len = %d\n", exp->subbed_var, exp->subbed_var_len);
+	return (exp->subbed_var);
+}
+
+char	*expand_d_quote(t_expander *exp, int *start_i)
+{
 	int		i;
-	char	*tmp;
-	char	*tmp2;
-	char	*tmp3;
-	int		test;
+	int		j;
+	char	*d_quote_expand;
 
 	*start_i += 1;
 	j = 0;
-	while (cmd[*start_i + j] && cmd[*start_i + j] != '\"')
+	while (exp->cmd[*start_i + j] && exp->cmd[*start_i + j] != '\"')
 		j++;
-	tmp = ft_substr(cmd, *start_i, j);
+	exp->cmd_part = ft_substr(exp->cmd, *start_i, j);
 	i = 0;
-	test = 0;
-	while (tmp[i])
+	while (exp->cmd_part[i])
 	{
-		test++;
-		if (test == 10)
-		{
-			printf("limit reached\n");
-			return (NULL);
-		}
-		printf("tmp[%d] = %c\n", i, tmp[i]);
-		tmp2 = expand_var(new_cmd, tmp, &i);
-		printf("d_quote_expand_var = %s\n", tmp2);
-		if (new_cmd)
-		{
-			printf("new_cmd exists --> join\n");
-			printf("new_cmd = %s\n", new_cmd);
-			printf("tmp2 = %s\n", tmp2);
-			if (tmp2)
-			{
-				tmp3 = ft_strdup(new_cmd);
-				new_cmd = ft_strjoin(tmp3, tmp2);
-			}
-			free(tmp3);
-			tmp3 = NULL;
-		}
+		j = i;
+		while (exp->cmd_part[i] && exp->cmd_part[i] != '$')
+			i++;
+		exp->op_index = i;
+		if (exp->cmd_part[i + j] == '$')
+			d_quote_expand = expand_var_in_d_quotes(exp, &i);
 		else
+			d_quote_expand = ft_substr(exp->cmd_part, i, j);
+		if (d_quote_expand)
 		{
-			if (tmp2)
-				new_cmd = ft_strdup(tmp2);
+			if (exp->new_cmd)
+				exp->new_cmd = ft_strjoin(exp->new_cmd, d_quote_expand);
 			else
-				new_cmd = NULL;
+				exp->new_cmd = ft_strdup(d_quote_expand);
 		}
-		if (tmp2)
-			free(tmp2);
+		if (d_quote_expand)
+		{
+			free(d_quote_expand);
+			d_quote_expand = NULL;
+		}
 	}
 	*start_i += j + 1;
-	return (new_cmd);
+	return (exp->new_cmd);
 }
 
-char	*expand_s_quote(char *cmd, char *new_cmd, int *start_i)
+char	*expand_s_quote(t_expander *exp, int *start_i)
 {
 	int		j;
 	char	*s_quote_expand;
-	char	*tmp;
 
 	*start_i += 1;
 	j = 0;
-	while (cmd[*start_i + j] && cmd[*start_i + j] != '\'')
+	while (exp->cmd[*start_i + j] && exp->cmd[*start_i + j] != '\'')
 		j++;
-	tmp = ft_substr(cmd, *start_i, j);
+	exp->cmd_part = ft_substr(exp->cmd, *start_i, j);
 	*start_i += j + 1;
-	if (!new_cmd)
-		s_quote_expand = ft_strdup(tmp);	
+	if (!exp->new_cmd)
+		s_quote_expand = ft_strdup(exp->cmd_part);	
 	else
-	{
-		s_quote_expand = ft_strjoin(new_cmd, tmp);
-	}
-	if (tmp)
-	{
-		free(tmp);
-		tmp = NULL;
-	}
+		s_quote_expand = ft_strjoin(exp->new_cmd, exp->cmd_part);
 	return (s_quote_expand);
 }

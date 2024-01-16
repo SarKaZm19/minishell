@@ -40,7 +40,7 @@ MSHELL_SRC		=	main.c shell_init.c shell_cycle.c \
 					exe_command.c exe_pipeline.c exe_redirection.c \
 					exe_logical.c exe_group.c \
 					get_bin_path.c \
-					expander.c \
+					expander.c exp_struct.c \
 					variable_expansion.c expander_case.c cmd_tab_expand.c \
 					prompt.c read_input.c \
 					lexer.c lexer_utils.c scan_next_token.c \
