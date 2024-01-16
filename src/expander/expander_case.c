@@ -11,7 +11,9 @@ char	*expand_no_quotes(t_expander *exp, int *start_i)
 		j++;
 	exp->cmd_part = ft_substr(exp->cmd, *start_i, j);
 	exp->cmd_part_len = j;
+	printf("cmd_part = %s, len = %d\n", exp->cmd_part, exp->cmd_part_len);
 	i = 0;
+	expand = NULL;
 	while (exp->cmd_part[i])
 	{
 		j = i;
@@ -21,7 +23,8 @@ char	*expand_no_quotes(t_expander *exp, int *start_i)
 		if (exp->cmd_part[i + j] == '$')
 			expand = expand_var(exp, &i);
 		else
-			expand = ft_substr(exp->cmd_part, i, j);
+			expand = ft_substr(exp->cmd_part, j, i - j);
+		printf("expand = %s\n", expand);
 		if (expand)
 		{
 			if (exp->new_cmd)
@@ -35,7 +38,7 @@ char	*expand_no_quotes(t_expander *exp, int *start_i)
 			expand = NULL;
 		}
 	}
-	*start_i += j + 1;
+	*start_i += (i - j) + 1;
 	return (exp->new_cmd);
 	//si * dans une var, pas de substitution du *, interprete litteralement
 	//voir si on peut pas lire tout d un coup et tout mettre dans un tableau apres dans expand
@@ -81,7 +84,7 @@ char	*expand_d_quote(t_expander *exp, int *start_i)
 		if (exp->cmd_part[i + j] == '$')
 			d_quote_expand = expand_var_in_d_quotes(exp, &i);
 		else
-			d_quote_expand = ft_substr(exp->cmd_part, i, j);
+			d_quote_expand = ft_substr(exp->cmd_part, j, i - j);
 		if (d_quote_expand)
 		{
 			if (exp->new_cmd)
@@ -95,7 +98,7 @@ char	*expand_d_quote(t_expander *exp, int *start_i)
 			d_quote_expand = NULL;
 		}
 	}
-	*start_i += j + 1;
+	*start_i += (i - j) + 1;
 	return (exp->new_cmd);
 }
 

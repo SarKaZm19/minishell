@@ -1,1 +1,1 @@
-{"type": "command", "cmd_exe": ["mak"]}
+{"type": "command", "cmd_exe": ["cat'hello''test'''cat"]}

@@ -30,8 +30,14 @@ char	*trim_white_spaces(t_expander *exp)
 	while (i < exp->subbed_var_len)
 	{
 		res[j] = exp->subbed_var[i];
-		while (is_space(exp->subbed_var[i]))
+		if (is_space(exp->subbed_var[i]))
+		{
+			while (is_space(exp->subbed_var[i]))
+				i++;
+		}
+		else
 			i++;
+		j++;
 	}
 	printf("res = %s\n", res);
 	res[j] = '\0';
@@ -66,7 +72,7 @@ char	*expand_var(t_expander *exp, int *tmp_i)
 
 	*tmp_i += 1;
 	j = 0;
-	while (exp->cmd_part[*tmp_i + j] && !is_space(exp->cmd_part[*tmp_i + j]) && ft_isalnum(exp->cmd_part[*tmp_i + j]))
+	while (exp->cmd_part[*tmp_i + j] && ft_isalnum(exp->cmd_part[*tmp_i + j] && exp->cmd_part[*tmp_i + j] != '"' && exp->cmd_part[*tmp_i + j] != '\''))
 		j++;
 	exp->var_to_sub = ft_substr(exp->cmd_part, *tmp_i, j);
 	exp->var_to_sub_len = j;
@@ -115,7 +121,7 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 		{
 			printf("no_quote...\n");
 			exp.new_cmd = expand_no_quotes(&exp, &i);
-			printf("exp.new_cmd d_quote = %s\n", exp.new_cmd);
+			printf("exp.new_cmd no_quote = %s\n", exp.new_cmd);
 		}
 		printf("new_cmd expand() = %s\n", exp.new_cmd);
 		if (exp.split_parts)
