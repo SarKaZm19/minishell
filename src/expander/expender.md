@@ -22,3 +22,20 @@ Donc la fonction expender() prend un argument un AST_COMMAND et retourne un AST.
 
 "Double quotes prevent word splitting during the expansion phase"
 => donc je suppose que l'expender doit avoir une notion du contexte dans lequel il est appelé.
+
+
+TESTS :
+'ls'
+'ls la'
+'ls''la'
+'ls $test la' / '$test ls la' / 'ls $test la'
+"ls"
+"ls la"
+"ls""la"
+"ls "" la"
+"ls $test"
+"ls$test"
+"ls $test la" / "$test ls la" / "ls la $test"
+"ls$test" -> 'cat'"ls$test" -> 'cat'"ls$test""lol" --> ast'cat'"ls$test""lol"ast 
+ast -> astast -> ast$test"ast"
+test $test = "hello world' --> test inside " and without

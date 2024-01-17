@@ -9,20 +9,25 @@ char	*trim_white_spaces(t_expander *exp, char *sub_env)
 
 	i = 0;
 	size = 0;
+	printf("subbed_var_len = %d\n", exp->subbed_var_len);
 	while (is_space(sub_env[i]))
 		i++;
-	while (i < exp->subbed_var_len && !is_space(sub_env[exp->subbed_var_len - 1]))
+	while (i < exp->subbed_var_len)
 	{
 		if (!is_space(sub_env[i]))
 			size++;
 		i++;
 	}
-	res = malloc(sizeof(char) * (size + 1));
+	printf("size = %d\n", size);
+	res = malloc(sizeof(char) * (size + exp->split_parts + 1));
 	if (!res)
 		return (NULL);
-	
 	i = 0;
 	j = 0;
+	while (i < exp->subbed_var_len && is_space(sub_env[i]))
+	{
+		
+	}
 	while (i < exp->subbed_var_len)
 	{
 		if (!is_space(sub_env[i]))
@@ -72,7 +77,7 @@ int		count_parts(char *subbed)
 		
 	}
 	printf("nb_w = %d\n", nb_w);
-	return (nb_w);
+	return (nb_w - 1);
 }
 
 char	*expand_var(t_expander *exp, int *tmp_i)
@@ -99,8 +104,8 @@ char	*expand_var(t_expander *exp, int *tmp_i)
 	}
 	exp->subbed_var_len = ft_strlen(sub_env);
 	printf("exp->subbed_var d_quotes = .%s., len = %d\n", sub_env, exp->subbed_var_len);
+	exp->split_parts = count_parts(sub_env);
 	exp->subbed_var = trim_white_spaces(exp, sub_env);
-	exp->split_parts = count_parts(exp->subbed_var);
 	printf("exp->split_parts = %d\n", exp->split_parts);
 	return (exp->subbed_var);
 }
@@ -118,12 +123,8 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 	i= 0;
 
 	init_expander(&exp, cmd);
-	int k = 0;
 	while (cmd[i])
 	{
-		k++;
-		if (k == 5)
-			break ;
 		printf("to_test = cmd[%d] = %c\n", i, cmd[i]);
 		if (cmd[i] == '\'')
 		{
