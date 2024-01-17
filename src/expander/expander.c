@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char	*trim_white_spaces(t_expander *exp)
+char	*trim_white_spaces(t_expander *exp, char *sub_env)
 {
 	char	*res;
 	int		i;
@@ -9,38 +9,41 @@ char	*trim_white_spaces(t_expander *exp)
 
 	i = 0;
 	size = 0;
-	while (is_space(exp->subbed_var[i]))
+	while (is_space(sub_env[i]))
 		i++;
-	while (is_space(exp->subbed_var[exp->subbed_var_len]))
-		exp->subbed_var_len--;
-	while (i < exp->subbed_var_len)
+	while (i < exp->subbed_var_len && !is_space(sub_env[exp->subbed_var_len - 1]))
 	{
-		if (!is_space(exp->subbed_var[i]))
+		if (!is_space(sub_env[i]))
 			size++;
 		i++;
 	}
-	printf("size = %d\n", size);
-	if (size == 0)
-		return (ft_strdup(exp->subbed_var));
-	res = malloc(sizeof(char) * (size + exp->split_parts + 1));
+	res = malloc(sizeof(char) * (size + 1));
 	if (!res)
 		return (NULL);
 	
+	i = 0;
 	j = 0;
 	while (i < exp->subbed_var_len)
 	{
-		res[j] = exp->subbed_var[i];
-		if (is_space(exp->subbed_var[i]))
+		if (!is_space(sub_env[i]))
 		{
-			while (is_space(exp->subbed_var[i]))
-				i++;
+			res[j] = sub_env[i];
+			j++;
 		}
 		else
-			i++;
-		j++;
+		{
+			while (i < exp->subbed_var_len && is_space(sub_env[i]))
+				i++;
+			if (i < exp->subbed_var_len)
+			{
+				res[j] = ' ';
+				j++;
+			}
+		}
+		i++;
 	}
-	printf("res = %s\n", res);
 	res[j] = '\0';
+	printf("res = %s\n", res);
 	return (res);
 }
 
@@ -56,11 +59,17 @@ int		count_parts(char *subbed)
 	while (subbed[i])
 	{
 		if (!is_space(subbed[i]))
+		{
 			nb_w++;
-		while (!is_space(subbed[i]))
+			while (subbed[i] && !is_space(subbed[i]))
+				i++;
+		}
+		else
+		{
+			while (subbed[i] && is_space(subbed[i]))
 			i++;
-		while (is_space(subbed[i]))
-			i++;
+		}
+		
 	}
 	printf("nb_w = %d\n", nb_w);
 	return (nb_w);
@@ -69,21 +78,29 @@ int		count_parts(char *subbed)
 char	*expand_var(t_expander *exp, int *tmp_i)
 {
 	int		j;
+	char	*sub_env;
 
 	*tmp_i += 1;
 	j = 0;
-	while (exp->cmd_part[*tmp_i + j] && ft_isalnum(exp->cmd_part[*tmp_i + j] && exp->cmd_part[*tmp_i + j] != '"' && exp->cmd_part[*tmp_i + j] != '\''))
+	while (exp->cmd_part[*tmp_i + j] && ft_isalnum(exp->cmd_part[*tmp_i + j]))
 		j++;
 	exp->var_to_sub = ft_substr(exp->cmd_part, *tmp_i, j);
 	exp->var_to_sub_len = j;
 	*tmp_i += exp->var_to_sub_len;
 	printf("exp->var_to_sub d_quotes = .%s., len = %d\n", exp->var_to_sub, exp->var_to_sub_len);
 	printf("new_tmp_i = %d\n", *tmp_i);
-	exp->subbed_var = getenv(exp->var_to_sub);
-	printf("exp->subbed_var d_quotes = .%s., len = %d\n", exp->subbed_var, exp->subbed_var_len);
+	sub_env = getenv(exp->var_to_sub);
+	if (!sub_env)
+	{
+		exp->subbed_var = NULL;
+		exp->subbed_var_len = 0;
+		exp->split_parts = 0;
+		return (NULL);
+	}
+	exp->subbed_var_len = ft_strlen(sub_env);
+	printf("exp->subbed_var d_quotes = .%s., len = %d\n", sub_env, exp->subbed_var_len);
+	exp->subbed_var = trim_white_spaces(exp, sub_env);
 	exp->split_parts = count_parts(exp->subbed_var);
-	exp->subbed_var = trim_white_spaces(exp);
-	exp->subbed_var_len = ft_strlen(exp->subbed_var);
 	printf("exp->split_parts = %d\n", exp->split_parts);
 	return (exp->subbed_var);
 }
@@ -93,22 +110,25 @@ char	*expand_var(t_expander *exp, int *tmp_i)
 char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 {
 	(void)sh;
-	(void)nb_cmds;
 	int	i;
 	char	**cmd_tab;
 	t_expander	exp;
 
 	cmd_tab = NULL;
 	i= 0;
+
 	init_expander(&exp, cmd);
+	int k = 0;
 	while (cmd[i])
 	{
+		k++;
+		if (k == 5)
+			break ;
 		printf("to_test = cmd[%d] = %c\n", i, cmd[i]);
-		exp.split_parts = 0;
 		if (cmd[i] == '\'')
 		{
 			printf("s_quote...\n");
-			exp.new_cmd = expand_s_quote(&exp, &i);
+			exp.new_cmd = expand_s_quote(&exp, sh, &i);
 			printf("exp.new_cmd s_quote = %s\n", exp.new_cmd);
 		}
 		else if (cmd[i] == '\"')
@@ -125,13 +145,17 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 		}
 		printf("new_cmd expand() = %s\n", exp.new_cmd);
 		if (exp.split_parts)
-			cmd_tab = word_split_expander(&exp, cmd_tab);
+			cmd_tab = word_split_expander(&exp, cmd_tab, sh);
 		printf("i = %d\n", i);
 		reset_exp(&exp);
 	}
-	cmd_tab = word_split_expander(&exp, cmd_tab);
-	*nb_cmds += exp.split_parts + 1;
-	printf("cmd_tab[0] = %s\n", cmd_tab[0]);
+	*nb_cmds += exp.split_parts;
+	cmd_tab = word_split_expander(&exp, cmd_tab, sh);
+	if (exp.new_cmd)
+	{
+		free(exp.new_cmd);
+		exp.new_cmd = NULL;
+	}
 	return (cmd_tab);
 }
 
@@ -149,6 +173,7 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 	char	**exp_word_split;
 	char	**cmd_tab;
 
+	nb_cmds = 0;
 	if (node->type == AST_REDIRECTION)
 		expand(node->data.redirection.file, sh, 0);
 	else if (node->type == AST_COMMAND)
@@ -161,11 +186,9 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 		while (node->data.command.cmd_exe[i])
 		{
 			exp_word_split = expand(node->data.command.cmd_exe[i], sh, &nb_cmds);
-			printf("exp_word_split[0] = %s\n", exp_word_split[0]);
 			printf("------end exp------\n");
 			printf("cmds size = %d\n", nb_cmds);
-			cmd_tab = add_cmds(cmd_tab, i, exp_word_split, nb_cmds);
-			printf("cmd_tab[0] = %s\n", cmd_tab[0]);
+			cmd_tab = add_cmds(cmd_tab, i, exp_word_split, nb_cmds, sh);
 			printf("??\n");
 			//cmd_tab = add_cmds(cmd_tab, i, exp_word_split, nb_cmds);
 			// ajout tableau recu dans expand dans le nouveau tab general.

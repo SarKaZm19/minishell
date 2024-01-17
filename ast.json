@@ -1,1 +1,1 @@
-{"type": "command", "cmd_exe": ["cat'hello''test'''cat"]}
+{"type": "command", "cmd_exe": ["$test$test"]}

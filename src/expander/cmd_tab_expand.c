@@ -1,22 +1,29 @@
 #include "minishell.h"
 
-char	**word_split_expander(t_expander *exp, char **cmd_tab)
+char	**word_split_expander(t_expander *exp, char **cmd_tab, t_shell *sh)
 {
 	char	**new_tab;
 
+	printf("----- START word split expander -----\n");
 	new_tab = NULL;
+	printf("exp->new_cmd = .%s.\n", exp->new_cmd);
 	printf("exp.split_parts = %d\n", exp->split_parts);
+	if (!exp->new_cmd)
+	{
+		if (!cmd_tab)
+			return (NULL);
+		return (cmd_tab);
+	}
 	if (!cmd_tab)
 	{
-		printf("no existing tab\n");
+			
 		if (exp->split_parts == 0)
 		{
 			new_tab = malloc(sizeof(char *) * 2);
-			if (!new_tab)
-				return (NULL);
+			s_alloc(new_tab, PROMPT, sh);
 			new_tab[0] = ft_strdup(exp->new_cmd);
+			s_alloc(new_tab[0], PROMPT, sh);
 			new_tab[1] = NULL;
-			printf("new_tab[0] = %s\n", cmd_tab[0]);
 		}
 		else
 		{
@@ -36,50 +43,56 @@ char	**word_split_expander(t_expander *exp, char **cmd_tab)
 		printf("existing tab\n");
 		//a faire si cmd_tab existe et split_part = 0 ou +
 	}
+	printf("----- END word split expander -----\n");
 	return (new_tab);
 }
 
-char	**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size)
+char	**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size, t_shell *sh)
 {
 	char	**new_cmds;
 	int		i;
 	int		j;
 
 	i = 0;
+	printf("tab_i = %d, new_tab_size = %d\n", tab_i, new_tab_size);
 	if (!cmd_to_add)
 	{
-		printf("no cmds to add\n");
+		printf("no cmd to add\n");
+		if (!cmd_tab)   // Si envoi une seule commande genre $test mais $test existe pas dans les var d'env, getenv renvoi null pas bon résultat en envoyant une string vide (prob pipex execve) ou un espace (considéré comme une commande)
+			return (NULL); // Renvoyer NUll fonctionne bien, juste une condition a rajouter dans l'executor à mon avis
 		new_cmds = malloc(sizeof(char *) * (tab_i + 1));
-		if (!new_cmds)
-			return (NULL);
+		s_alloc(new_cmds, PROMPT, sh);
 		while (i < tab_i)
 		{
 			new_cmds[i] = ft_strdup(cmd_tab[i]);
-			printf("new_cmds[%d] = %s\n", i, new_cmds[i]);
+			printf("new_cmds[%d] = %s", i, new_cmds[i]);
+			s_alloc(new_cmds[i], PROMPT, sh);
 			i++;
 		}
+		new_cmds[i] = NULL;
 		return (new_cmds);
 	}
-	printf("cmds to add\n");
-	printf("tab_i + new_tab_size = %d\n", tab_i + new_tab_size);
+	if (new_tab_size == 0)
+		new_tab_size += 1;
 	new_cmds = malloc(sizeof(char *) * (tab_i + new_tab_size + 1));
-	if (!new_cmds)
-		return (NULL);
+	s_alloc(new_cmds, PROMPT, sh);
 	i = 0;
 	while (i < tab_i)
 	{
 		new_cmds[i] = ft_strdup(cmd_tab[i]);
+		s_alloc(new_cmds[i], PROMPT, sh);
+		printf("new_cmds[%d] %s = %s cmd_tab[%d]\n", i, new_cmds[i],  cmd_tab[i], i);
 		i++;
 	}
 	j = 0;
 	while (cmd_to_add && j < new_tab_size)
 	{
 		new_cmds[i] = ft_strdup(cmd_to_add[j]);
+		s_alloc(new_cmds[i], PROMPT, sh);
 		i++;
 		j++;
 	}
 	new_cmds[i] = NULL;
-	i = 0;
 	return (new_cmds);
 }
 

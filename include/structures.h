@@ -9,7 +9,7 @@ typedef enum t_tracking_scope
 {
 	ONLY_CHECK,
 	SH,
-	PROMPT
+	PROMPT,
 }				t_tracking_scope;
 
 // Main structure ?
