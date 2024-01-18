@@ -9,7 +9,6 @@ char	*trim_white_spaces(t_expander *exp, char *sub_env)
 
 	i = 0;
 	size = 0;
-	printf("subbed_var_len = %d\n", exp->subbed_var_len);
 	while (is_space(sub_env[i]))
 		i++;
 	while (i < exp->subbed_var_len)
@@ -18,22 +17,20 @@ char	*trim_white_spaces(t_expander *exp, char *sub_env)
 			size++;
 		i++;
 	}
-	printf("size = %d\n", size);
 	res = malloc(sizeof(char) * (size + exp->split_parts + 1));
 	if (!res)
 		return (NULL);
 	i = 0;
 	j = 0;
-	while (i < exp->subbed_var_len && is_space(sub_env[i]))
-	{
-		
-	}
+	while (sub_env[i] && is_space(sub_env[i]))
+		i++;
 	while (i < exp->subbed_var_len)
 	{
 		if (!is_space(sub_env[i]))
 		{
 			res[j] = sub_env[i];
 			j++;
+			i++;
 		}
 		else
 		{
@@ -45,7 +42,6 @@ char	*trim_white_spaces(t_expander *exp, char *sub_env)
 				j++;
 			}
 		}
-		i++;
 	}
 	res[j] = '\0';
 	printf("res = %s\n", res);
@@ -105,8 +101,8 @@ char	*expand_var(t_expander *exp, int *tmp_i)
 	exp->subbed_var_len = ft_strlen(sub_env);
 	printf("exp->subbed_var d_quotes = .%s., len = %d\n", sub_env, exp->subbed_var_len);
 	exp->split_parts = count_parts(sub_env);
-	exp->subbed_var = trim_white_spaces(exp, sub_env);
 	printf("exp->split_parts = %d\n", exp->split_parts);
+	exp->subbed_var = trim_white_spaces(exp, sub_env);
 	return (exp->subbed_var);
 }
 
@@ -114,7 +110,6 @@ char	*expand_var(t_expander *exp, int *tmp_i)
 // Expand function takes a cmd_tab index and check the expansion with $, ",' and *
 char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 {
-	(void)sh;
 	int	i;
 	char	**cmd_tab;
 	t_expander	exp;
@@ -146,12 +141,23 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 		}
 		printf("new_cmd expand() = %s\n", exp.new_cmd);
 		if (exp.split_parts)
+		{
+			exp.nb_cmds += exp.split_parts;
 			cmd_tab = word_split_expander(&exp, cmd_tab, sh);
+			free(exp.new_cmd);
+			exp.new_cmd = NULL;
+			reset_exp(&exp);
+		}
 		printf("i = %d\n", i);
-		reset_exp(&exp);
 	}
-	*nb_cmds += exp.split_parts;
-	cmd_tab = word_split_expander(&exp, cmd_tab, sh);
+	printf("exp.split_parts = %d\n", exp.split_parts);
+	printf("exp.nb_cmds = %d, nb_cmds = %d\n", exp.nb_cmds, *nb_cmds);
+	if (!exp.split_parts && exp.new_cmd)
+		cmd_tab = word_split_expander(&exp, cmd_tab, sh);
+	*nb_cmds += exp.nb_cmds;
+	if (!exp.new_cmd)
+		*nb_cmds -= 1;
+	exp.nb_cmds = 0;
 	if (exp.new_cmd)
 	{
 		free(exp.new_cmd);
@@ -171,6 +177,7 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 	int		j;
 	//int		mem_size;
 	int		nb_cmds;
+	int		mem_nb_cmds;
 	char	**exp_word_split;
 	char	**cmd_tab;
 
@@ -186,10 +193,11 @@ char	**expand(char *cmd, t_shell *sh, int *nb_cmds)
 		i = 0;
 		while (node->data.command.cmd_exe[i])
 		{
+			mem_nb_cmds = nb_cmds;
 			exp_word_split = expand(node->data.command.cmd_exe[i], sh, &nb_cmds);
 			printf("------end exp------\n");
 			printf("cmds size = %d\n", nb_cmds);
-			cmd_tab = add_cmds(cmd_tab, i, exp_word_split, nb_cmds, sh);
+			cmd_tab = add_cmds(cmd_tab, mem_nb_cmds, exp_word_split, nb_cmds, sh);
 			printf("??\n");
 			//cmd_tab = add_cmds(cmd_tab, i, exp_word_split, nb_cmds);
 			// ajout tableau recu dans expand dans le nouveau tab general.

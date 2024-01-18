@@ -82,7 +82,7 @@ char				*expand_var_in_d_quotes(t_expander *exp, int *start_i);
 char				*expand_s_quote(t_expander *exp, t_shell *sh, int *start_i);
 // ----- cmd_tab_expansion.c ----- //
 char				**word_split_expander(t_expander *exp, char **cmd_tab, t_shell *sh);
-char				**add_cmds(char	**cmd_tab, int tab_i, char **cmd_to_add, int new_tab_size, t_shell *sh);
+char				**add_cmds(char	**cmd_tab, int cmd_tab_size, char **cmd_to_add, int new_tab_size, t_shell *sh);
 char				**split_cmds(t_expander *exp);
 char				**cmd_to_tab(t_expander *exp, char **cmd_tab);
 

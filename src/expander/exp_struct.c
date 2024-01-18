@@ -13,6 +13,7 @@ void	init_expander(t_expander *exp, char *cmd)
 	exp->var_to_sub_len = 0;
 	exp->cmd_len = ft_strlen(cmd);
 	exp->subbed_var_len = 0;
+	exp->nb_cmds = 1;
 }
 
 void	reset_exp(t_expander *exp)

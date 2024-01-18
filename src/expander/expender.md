@@ -25,6 +25,7 @@ Donc la fonction expender() prend un argument un AST_COMMAND et retourne un AST.
 
 
 TESTS :
+"" --> exec_command à modif je pense
 'ls'
 'ls la'
 'ls''la'
@@ -39,3 +40,7 @@ TESTS :
 "ls$test" -> 'cat'"ls$test" -> 'cat'"ls$test""lol" --> ast'cat'"ls$test""lol"ast 
 ast -> astast -> ast$test"ast"
 test $test = "hello world' --> test inside " and without
+ast$test --> $test"hello" --> ast$test"hello" --> ast$test"hello"'hello'
+"hello"'hello'$test"cat""oui" 
+$test$test --> 
+ast"hello"$test$test"hello""$test$test"

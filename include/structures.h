@@ -54,6 +54,7 @@ typedef struct s_expander
 	int		var_to_sub_len;
 	int		subbed_var_len;
 	int		split_parts;
+	int		nb_cmds;
 }				t_expander;
 
 # define READ_END 0
