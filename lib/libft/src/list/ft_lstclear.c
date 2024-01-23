@@ -6,7 +6,7 @@
 /*   By: ugerkens <ugerkens@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 18:09:59 by ugerkens          #+#    #+#             */
-/*   Updated: 2023/10/19 18:34:20 by ugerkens         ###   ########.fr       */
+/*   Updated: 2024/01/14 20:38:09 by ugerkens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,5 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 		ft_lstdelone(*lst, del);
 		*lst = buffer;
 	}
+	*lst = NULL;
 }

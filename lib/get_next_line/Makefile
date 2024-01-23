@@ -6,7 +6,7 @@
 #    By: ugerkens <ugerkens@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/07/14 16:05:56 by ugerkens          #+#    #+#              #
-#    Updated: 2023/10/19 00:11:44 by ugerkens         ###   ########.fr        #
+#    Updated: 2024/01/17 14:03:51 by ugerkens         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ RM				=	rm -rf
 # Paths and Files
 VPATH			=	src
 SRCS			=	get_next_line.c get_next_line_utils.c
-OBJS			=	$(addprefix obj/,$(SRCS:.c=.o))
+OBJS			=	$(addprefix build/,$(SRCS:.c=.o))
 
 # Rules
 $(NAME):		$(OBJS)
@@ -27,15 +27,15 @@ $(NAME):		$(OBJS)
 
 all:			$(NAME)
 
-obj:
-				mkdir -p obj
+build:
+				mkdir -p build
 
-obj/%.o:		%.c | obj
+build/%.o:		%.c | build
 				mkdir -p $(dir $@)
 				$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-				$(RM) obj
+				$(RM) build
 
 fclean:			clean
 				$(RM) $(NAME)

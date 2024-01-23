@@ -64,7 +64,7 @@ void print_tokens(t_list *tokens) {
 #include <stdlib.h>
 #include <string.h>
 
-void ast_to_json(t_AST *node, char **json_str);
+void ast_to_json(t_ast *node, char **json_str);
 
 void escape_and_append(char **json_str, const char *str) {
     while (*str) {
@@ -87,7 +87,7 @@ void command_to_json(t_ast_command *command, char **json_str) {
         escape_and_append(json_str, command->cmd_exe[i]);
         strcat(*json_str, "\"");
     }
-    strcat(*json_str, "]}");
+    strcat(*json_str, "}");
 }
 
 // // Alternative implementation that uses a single string to represent command arguments
@@ -155,7 +155,7 @@ void redirection_to_json(t_ast_redirection *redirection, char **json_str) {
 }
 
 
-void ast_to_json(t_AST *node, char **json_str) {
+void ast_to_json(t_ast *node, char **json_str) {
     if (!node)
 		return;
 
@@ -181,7 +181,7 @@ void ast_to_json(t_AST *node, char **json_str) {
     }
 }
 
-void write_ast_to_file(t_AST *root, const char *filename) 
+void write_ast_to_file(t_ast *root, const char *filename) 
 {
     char *json_str = malloc(10000); // Adjust size as necessary
     if (!json_str) {

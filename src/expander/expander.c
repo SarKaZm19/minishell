@@ -1,105 +1,5 @@
 #include "minishell.h"
 
-char	*trim_white_spaces(t_expander *exp, char *sub_env)
-{
-	char	*res;
-	int		i;
-	int		size;
-	int		j;
-
-	i = 0;
-	size = 0;
-	while (is_space(sub_env[i]))
-		i++;
-	while (i < exp->subbed_var_len)
-	{
-		if (!is_space(sub_env[i]))
-			size++;
-		i++;
-	}
-	res = malloc(sizeof(char) * (size + exp->split_parts + 1));
-	if (!res)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (sub_env[i] && is_space(sub_env[i]))
-		i++;
-	while (i < exp->subbed_var_len)
-	{
-		if (!is_space(sub_env[i]))
-		{
-			res[j] = sub_env[i];
-			j++;
-			i++;
-		}
-		else
-		{
-			while (i < exp->subbed_var_len && is_space(sub_env[i]))
-				i++;
-			if (i < exp->subbed_var_len)
-			{
-				res[j] = ' ';
-				j++;
-			}
-		}
-	}
-	res[j] = '\0';
-	return (res);
-}
-
-int		count_parts(char *subbed)
-{
-	int	i;
-	int	nb_w;
-
-	i = 0;
-	nb_w = 0;
-	while (is_space(subbed[i]))
-		i++;
-	while (subbed[i])
-	{
-		if (!is_space(subbed[i]))
-		{
-			nb_w++;
-			while (subbed[i] && !is_space(subbed[i]))
-				i++;
-		}
-		else
-		{
-			while (subbed[i] && is_space(subbed[i]))
-			i++;
-		}
-		
-	}
-	return (nb_w - 1);
-}
-
-char	*expand_var(t_expander *exp, int *tmp_i)
-{
-	int		j;
-	char	*sub_env;
-
-	*tmp_i += 1;
-	j = 0;
-	while (exp->cmd_part[*tmp_i + j] && ft_isalnum(exp->cmd_part[*tmp_i + j]))
-		j++;
-	exp->var_to_sub = ft_substr(exp->cmd_part, *tmp_i, j);
-	exp->var_to_sub_len = j;
-	*tmp_i += exp->var_to_sub_len;
-	sub_env = getenv(exp->var_to_sub);
-	if (!sub_env)
-	{
-		exp->subbed_var = NULL;
-		exp->subbed_var_len = 0;
-		exp->split_parts = 0;
-		return (NULL);
-	}
-	exp->subbed_var_len = ft_strlen(sub_env);
-	exp->split_parts = count_parts(sub_env);
-	exp->subbed_var = trim_white_spaces(exp, sub_env);
-	return (exp->subbed_var);
-}
-
 /*
 // exp struct is used to store all data and send them through the program
 // treat_* --> Different cases that need to be handled '," or nothing
@@ -118,33 +18,45 @@ char	**expand_arg(char *arg, t_shell *sh, int *nb_cmds)
 	init_expander(&exp, arg);
 	while (arg[i])
 	{
+		printf("...\n");
 		if (arg[i] == '\'')
-			exp.new_cmd = treat_s_quotes(&exp, sh, &i);
+			exp.new_arg = treat_s_quotes(&exp, sh, &i);
 		else if (arg[i] == '\"')
-			exp.new_cmd = treat_d_quotes(&exp, sh, &i);
+			exp.new_arg = treat_d_quotes(&exp, sh, &i);
 		else
-			exp.new_cmd = treat_no_quotes(&exp, sh, &i);
-		if (exp.split_parts)
+			exp.new_arg = treat_no_quotes(&exp, sh, &i);
+		if (exp.nb_split_parts)
 		{
-			exp.nb_cmds += exp.split_parts;
+			exp.nb_args += exp.nb_split_parts;
 			cmd_tab = word_split_expander(&exp, cmd_tab, sh);
-			free(exp.new_cmd);
-			exp.new_cmd = NULL;
+			free(exp.new_arg);
+			exp.new_arg = NULL;
 			reset_exp(&exp);
 		}
+		printf("exp.new_arg = %s\n", exp.new_arg);
 	}
-	if (!exp.split_parts && exp.new_cmd)
+	if (!exp.nb_split_parts && exp.new_arg)
 		cmd_tab = word_split_expander(&exp, cmd_tab, sh);
-	*nb_cmds += exp.nb_cmds;
-	if (!exp.new_cmd)
+	*nb_cmds += exp.nb_args;
+	if (!exp.new_arg)
 		*nb_cmds -= 1;
-	exp.nb_cmds = 0;
-	if (exp.new_cmd)
+	exp.nb_args = 0;
+	if (exp.new_arg)
 	{
-		free(exp.new_cmd);
-		exp.new_cmd = NULL;
+		free(exp.new_arg);
+		exp.new_arg = NULL;
 	}
 	return (cmd_tab);
+}
+
+void	print_tab(char **str)
+{
+	int i = 0;
+	while (str[i])
+	{
+		printf("str[%d] = %s\n", i, str[i]);
+		i++;
+	}
 }
 
 /*
@@ -152,7 +64,7 @@ char	**expand_arg(char *arg, t_shell *sh, int *nb_cmds)
 // expand_arg --> treat each command and expand them, return the tab of expanded arg
 // cmd_tab --> New node->data.command.cmd_exe values
  */
- t_AST	*expander(t_AST *node, t_shell *sh)
+ t_ast	*expander(t_ast *node, t_shell *sh)
 {
 	int		i;
 	int		nb_cmds;
@@ -166,15 +78,16 @@ char	**expand_arg(char *arg, t_shell *sh, int *nb_cmds)
 	if (node->type == AST_COMMAND)
 	{
 		cmd_tab = NULL;
-		i = 0;;
+		i = 0;
 		while (node->data.command.cmd_exe[i])
 		{
 			mem_nb_cmds = nb_cmds;
 			exp_word_split = expand_arg(node->data.command.cmd_exe[i], sh, &nb_cmds);
-			cmd_tab = add_cmds(cmd_tab, mem_nb_cmds, exp_word_split, nb_cmds, sh);
+			cmd_tab = add_exp_to_cmd_tab(cmd_tab, mem_nb_cmds, exp_word_split, nb_cmds - mem_nb_cmds, sh);
 			i++;
 		}
 		node->data.command.cmd_exe = cmd_tab;
+		//print_tab(cmd_tab);
 	} 
 	return (node);
 }

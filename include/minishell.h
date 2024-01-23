@@ -12,6 +12,7 @@ void			clear_prompt(t_shell *sh);
 // General utils
 void			add_arg_to_array(char ***char_array, char *new_arg,
 					t_shell *sh);
+void			free_strs(char ***strs);
 
 // ----- SIGNAL ----- //
 // Set signal
@@ -41,31 +42,29 @@ int				is_space(int c);
 int				is_token(int c);
 
 // ----- PARSER ----- //
-int				parser(t_list *token_list, t_AST **ast, t_shell *sh);
+int				parser(t_list *token_list, t_ast **ast, t_shell *sh);
 // Syntax Three
-t_AST			*parse_logical(t_list **token_list, t_shell *sh);
-t_AST			*parse_pipeline(t_list **token_list, t_shell *sh);
-t_AST			*parse_group(t_list **token_list, t_shell *sh);
-t_AST			*parse_command(t_list **token_list, t_shell *sh);
+t_ast			*parse_logical(t_list **token_list, t_shell *sh);
+t_ast			*parse_pipeline(t_list **token_list, t_shell *sh);
+t_ast			*parse_group(t_list **token_list, t_shell *sh);
+t_ast			*parse_command(t_list **token_list, t_shell *sh);
 // Parse redirection
-t_AST			*parse_redirection(t_list **token_list, t_shell *sh);
-t_AST			*parse_redirection_list(t_list **token_list, t_AST *command,
+t_ast			*parse_redirection(t_list **token_list, t_shell *sh);
+t_ast			*parse_redirection_list(t_list **token_list, t_ast *command,
 					t_shell *sh);
-t_AST			*build_redirected_command(t_AST *prefix, t_AST *suffix,
-					t_AST *child);
+t_ast			*build_redirected_command(t_ast *prefix, t_ast *suffix,
+					t_ast *child);
 // Parse redirection utils
-t_AST			*get_last_of_redirection_list(t_AST *node);
+t_ast			*get_last_of_redirection_list(t_ast *node);
 // Create AST Nodes
 void			*set_syntax_error(char *unexpected_token, t_shell *sh);
-void			init_ast_node(t_AST **node, t_ast_type type, t_shell *sh);
-t_AST			*create_ast_command(char **argv, t_shell *sh);
-t_AST			*create_ast_group(t_AST *child, t_shell *sh);
-t_AST	*create_ast_redirection(t_token_type direction,
-								t_list *tk_filename,
-								t_AST *child,
-								t_shell *sh);
-t_AST			*create_ast_pipeline(t_AST *left, t_AST *right, t_shell *sh);
-t_AST			*create_ast_logical(t_AST *left, t_token_type operator, t_AST
+void			init_ast_node(t_ast **node, t_ast_type type, t_shell *sh);
+t_ast			*create_ast_command(char **argv, t_shell *sh);
+t_ast			*create_ast_group(t_ast *child, t_shell *sh);
+t_ast			*create_ast_redirection(t_token_type direction,
+					t_list *tk_filename, t_ast *child, t_shell *sh);
+t_ast			*create_ast_pipeline(t_ast *left, t_ast *right, t_shell *sh);
+t_ast			*create_ast_logical(t_ast *left, t_token_type operator, t_ast
 					* right, t_shell *sh);
 
 // utils_token.c
@@ -76,7 +75,7 @@ char			*tk_type_to_string(t_token_type type);
 
 // ----- EXPANSION ----- //
 // ----- Expander.c ---- //
-t_AST			*expander(t_AST *node, t_shell *sh);
+t_ast			*expander(t_ast *node, t_shell *sh);
 char			**expand_arg(char *str, t_shell *sh, int *current_size);
 char			*expand_var(t_expander *exp, int *tmp_i);
 // ----- exp_struct.c ----- //
@@ -89,17 +88,23 @@ char			*get_var_sub(char *var, int *tmp_i);
 char			*treat_no_quotes(t_expander *exp, t_shell *sh, int *start_i);
 char			*treat_d_quotes(t_expander *exp, t_shell *sh, int *start_i);
 char			*treat_s_quotes(t_expander *exp, t_shell *sh, int *start_i);
-char			*expand_var_in_d_quotes(t_expander *exp, int *start_i);
+char			*d_quote_dollar_expand (t_expander *exp, t_shell *sh, int *i);
+int				count_parts(char *subbed);
+char			*trim_white_spaces(t_expander *exp, char *sub_env);
+char			*expand_var(t_expander *exp, int *tmp_i);
+
+
+
 // ----- cmd_tab_expansion.c ----- //
 char			**word_split_expander(t_expander *exp, char **cmd_tab,
 					t_shell *sh);
-char			**add_cmds(char **cmd_tab, int cmd_tab_size, char **cmd_to_add,
-					int new_tab_size, t_shell *sh);
-char			**split_cmds(t_expander *exp);
-char			**cmd_to_tab(t_expander *exp, char **cmd_tab);
+char	**add_exp_to_cmd_tab(char **cmd_tab, int cmd_tab_size, char **exp_tab,
+					 int new_tab_size, t_shell *sh);
+
+
 
 // ----- EXECUTION ----- //
-int				execute(t_AST *node, t_execute_end end, t_shell *sh);
+int				execute(t_ast *node, t_execute_end end, t_shell *sh);
 int				check_process_child_exit(int status, bool *new_line,
 					t_shell *sh);
 
@@ -116,15 +121,15 @@ int				redirect_input(t_ast_redirection *redir, t_shell *sh);
 int				redirect_output(t_ast_redirection *redir, t_shell *sh);
 int				append_output(t_ast_redirection *redir, t_shell *sh);
 // Execute Redirection: Heredoc
-int				execute_heredocs(t_AST *node, t_shell *sh);
-int				search_for_heredocs(t_AST *node, t_shell *sh);
+int				execute_heredocs(t_ast *node, t_shell *sh);
+int				search_for_heredocs(t_ast *node, t_shell *sh);
 int				heredoc_listener(t_ast_redirection *redir, char *tmp_file_name,
 					t_shell *sh);
 void			heredoc_warming_message(char *delimiter, t_shell *sh);
 
 // Execute Pipeline
-int				execute_pipeline(t_AST *node, t_shell *sh);
-t_list			*build_cmd_list(t_AST *node, t_shell *sh);
+int				execute_pipeline(t_ast *node, t_shell *sh);
+t_list			*build_cmd_list(t_ast *node, t_shell *sh);
 int				execute_pipeline_list(t_list *cmd_list, t_shell *sh);
 pid_t			execute_pipeline_command(t_list *cmd_list, t_shell *sh,
 					int prev_read_end, int p[2]);
@@ -133,15 +138,23 @@ void			setup_for_next_command(int *prev_read_end, int p[2],
 int				wait_for_children(t_shell *sh, pid_t last_pid, int n_cmd);
 
 // Execute Command
-int				execute_command(t_ast_command *cmd, t_shell *sh);
+int				execute_command(t_ast_command *cmd, t_execute_end end,
+					t_shell *sh);
 // Select the builtin function
 builtin_func	get_builtin_function(char *cmd_name);
 // Seach binary path for execution
 char			*get_bin_path(char *bin, t_shell *sh);
-char			**get_env_paths(t_shell *sh);
-char			*find_path(char *bin, t_shell *sh);
-char			*join_path(char *dir, char *file, t_shell *sh);
+char			*find_bin_path(char *bin, t_shell *sh);
+char			*search_in_saved_bins_path(char *bin, t_list *saved_bin_paths,
+					t_shell *sh);
+char			*find_with_paths_array(char *bin_name, char **paths,
+					t_shell *sh);
+
+// Seach binary path: utils
 bool			check_access(char *bin, t_shell *sh);
+char			**build_paths_array(t_shell *sh);
+bool			check_current_dir(char *paths);
+char			*join_path(char *dir, char *file, t_shell *sh);
 
 // ----- BUILTINS ----- //
 // Echo
@@ -153,10 +166,11 @@ int				pwd_builtin(t_ast_command *cmd, t_shell *sh);
 // Export
 int				export_builtin(t_ast_command *cmd, t_shell *sh);
 void			export_one(char *assignment, bool *name_error, t_shell *sh);
+void			report_name_error(char *assignment, bool *name_error, t_shell *sh);
+void			edit_env_value(t_list *env_var, char *new_value, bool add, t_shell *sh);
 bool			is_valid_name(char *name);
 // Unset
 int				unset_builtin(t_ast_command *cmd, t_shell *sh);
-t_list			*get_env_var(char *name, t_list *env);
 void			remove_env_var(t_list *env, t_shell *sh);
 void			free_env_var(void *env);
 // Env
@@ -170,21 +184,23 @@ long long		ft_atoi_long_long(const char *str);
 
 // ----- ENVIRONMENT ----- //
 // Init Environment
-t_env_var		*init_env_var(char *name, char *value, t_shell *sh);
+void			add_new_env_var(char *name, char *value, t_list **list,
+					t_shell *sh);
 t_list			*init_env(char **env, t_shell *sh);
 // Distribute Environment
 int				print_env(bool export_format, t_list *env, t_shell *sh);
 char			**env_to_char_array(t_shell *sh);
 // Environment Utilities
+t_list			*get_env_var(char *name, t_list *env);
 char			*env_name(t_list *env);
 char			*env_value(t_list *env);
+void			check_for_modified_path(char *env_var, t_shell *sh);
 
 // ----- UTILS ----- //
 
 // Error (pipex import)
 void			error(const char *context, char *description, int exit_status,
 					t_shell *sh);
-void			quit_shell(int exit_status, t_shell *sh);
 void			syscall_error(const char *context, int errnum, t_shell *sh);
 int				report_errno(char *context, t_shell *sh);
 int				report_syntax_error(t_shell *sh);
@@ -213,6 +229,6 @@ pid_t			s_wait(int *wstatus, t_shell *sh);
 
 // ----- DEBUG ----- //
 void			print_tokens(t_list *tokens);
-void			print_ast(t_AST *ast);
-void			write_ast_to_file(t_AST *root, const char *filename);
+void			print_ast(t_ast *ast);
+void			write_ast_to_file(t_ast *root, const char *filename);
 const char		*token_type_to_string(t_token_type type);

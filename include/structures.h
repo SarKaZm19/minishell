@@ -3,12 +3,18 @@
 
 extern volatile sig_atomic_t	g_signal_value;
 
-#define SCOPES 3
+// todo: check the new norm, III.4 Typedef, struct, enum and union
+// can enum be in CAPITAL letter?: You must indent all structures’ names on the same column for their scope.
+
+// todo: slipt stucture.h into shell.h and token.h, ast.h
+
+#define SCOPES 4
 typedef enum t_tracking_scope
 {
 	ONLY_CHECK,
 	SH,
-	PROMPT
+	PROMPT,
+	EXPANDER
 }								t_tracking_scope;
 
 typedef enum t_execute_end
@@ -17,17 +23,18 @@ typedef enum t_execute_end
 	O_EXIT
 }								t_execute_end;
 
-// Main structure ?
 typedef struct s_shell
 {
-	t_list						*env;
-	char						**env_paths;
-
+	t_list						*env; // t_list of t_env_var
+	char						**saved_paths_array; // manage by PROMPT scope
+	t_list						*saved_bin_paths; // t_list of t_env_var
+	// todo: free saved_paths_array and saved_bin_paths at quit_minishell
+	//
 	t_list						*allocated_pointers[SCOPES];
 	t_list						*temporary_files;
-	// allocated_pointers are freed after each prompt execution
+	//
 	char						*parsing_error;
-	bool						in_main_process;
+	bool						in_main_process; // todo: could be replace by SHVL? not sure
 	int							last_prompt_exit_status;
 }								t_shell;
 
@@ -54,17 +61,21 @@ typedef struct s_pipe
 
 typedef struct s_expander
 {
-	char						*cmd;
-	char						*cmd_part;
+	char						*arg;
+	int							arg_len;
+
+	char						*arg_part;
+	int							arg_part_len;
+
 	char						*var_to_sub;
-	char						*subbed_var;
-	char						*new_cmd;
-	int							cmd_len;
-	int							cmd_part_len;
 	int							var_to_sub_len;
+
+	char						*subbed_var;
 	int							subbed_var_len;
-	int							split_parts;
-	int							nb_cmds;
+
+	char						*new_arg;
+	int							nb_split_parts;
+	int							nb_args;
 }								t_expander;
 
 #define READ_END 0
@@ -111,28 +122,28 @@ typedef struct s_ast_command
 
 typedef struct s_ast_pipeline
 {
-	struct s_AST				*left;
-	struct s_AST				*right;
+	struct s_ast				*left;
+	struct s_ast				*right;
 }								t_ast_pipeline;
 
 typedef struct s_ast_logical
 {
 	t_token_type				operator;
-	struct s_AST				*left;
-	struct s_AST				*right;
+	struct s_ast				*left;
+	struct s_ast				*right;
 }								t_ast_logical;
 
 typedef struct s_ast_redirection
 {
 	t_token_type				direction;
 	// TK_REDIRECT_IN, TK_REDIRECT_OUT, TK_APPEND_OUT,TK_HEREDOC
-	struct s_AST				*child;
+	struct s_ast				*child;
 	char						*file;
 }								t_ast_redirection;
 
 typedef struct s_ast_group
 {
-	struct s_AST				*child;
+	struct s_ast				*child;
 }								t_ast_group;
 
 typedef struct s_ast_syntax_error
@@ -140,7 +151,7 @@ typedef struct s_ast_syntax_error
 	char						*unexpected_token;
 }								t_ast_syntax_error;
 
-typedef struct s_AST
+typedef struct s_ast
 {
 	t_ast_type					type;
 	union
@@ -152,7 +163,7 @@ typedef struct s_AST
 		t_ast_group				group;
 		t_ast_syntax_error		s_error;
 	} data;
-}								t_AST;
+}								t_ast;
 
 typedef int						(*builtin_func)(t_ast_command *, t_shell *);
 

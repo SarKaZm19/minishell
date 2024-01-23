@@ -19,5 +19,21 @@ void	track_alloc(void *pointer, t_tracking_scope scope, t_shell *sh)
 		free(pointer);
 		error("Memory allocation", strerror(errno), EXIT_FAILURE, sh);
 	}
+	printf("new_node content = %s\n", new_node->content);
 	ft_lstadd_front(&sh->allocated_pointers[scope], new_node);
+}
+
+// warning: it doesn't allocate the content, but the list node
+void	lst_add_and_track(void *content, t_list **lst, t_tracking_scope scope, t_shell *sh)
+{
+	t_list	*new_node;
+
+	new_node = ft_lstnew(content);
+	if (!new_node)
+	{
+		free(content);
+		error("Memory allocation", strerror(errno), EXIT_FAILURE, sh);
+	}
+	ft_lstadd_front(lst, new_node);
+	track_alloc(new_node, scope, sh);
 }
